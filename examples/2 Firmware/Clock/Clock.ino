@@ -42,9 +42,6 @@
     
 */
 
-// ЧТО СДЕЛАТЬ:
-// сделать какой нибудь корректный вывод в порт или отключить его
-
 
 #include <Dipformer_Clock.h>
 #include <EEPROM.h>
@@ -190,12 +187,10 @@ uint8_t alarmState = ALARM_OFF;
 void setup() {
   wdt_enable(WDTO_8S);
   
-  Serial.begin (9600);
   
   Clock.begin (); 
   
-  if (restoreSettings () == 0) {
-    //Serial.println ("First start");   
+  if (restoreSettings () == 0) { // первый запуск контроллера, в памяти совсем нет данных
     settings.showMode = 3;
     settings.brightness = 4;
     settings.autoBrightness = 1;
@@ -249,11 +244,9 @@ void loop() {
   //////////////////
   // calculate hand
   //////////////////
-  //Serial.println (curLight);
   if ((millis () > 2000) && (keyEvent == 0)) {
     if (handStates == 0) {
       if ((curLight < lights[0] * 0.7) && (lights[0] >= 2)) {
-        Serial.println (curLight);
 
         handStates = 1;
         handLight = lights[0];
@@ -272,7 +265,6 @@ void loop() {
     }
   }
 
-  //if (keyEvent != 0) Serial.println (keyEvent);
 
   if (alarmState == ALARM_ON) {
     if (keyEvent !=0) {
@@ -295,7 +287,6 @@ void loop() {
     keysHandlerModeWork ();
     
     if (prevSeconds != dateTime.seconds) { 
-      //printTime ();     
       prevSeconds = dateTime.seconds;
       cpuMillis = millis ();
       halfSecond = 0;
@@ -375,24 +366,6 @@ void reverseOnOff (uint8_t * v) {
   else *v = 0;
 }
 
-void printTime () {
-  /*
-  Serial.print (dateTime.hour);
-  Serial.print (":");
-  Serial.print (dateTime.minutes);
-  Serial.print (":");
-  Serial.print (dateTime.seconds);
-  Serial.print (" ");
-  Serial.print (dateTime.date);
-  Serial.print (".");
-  Serial.print (dateTime.month);
-  Serial.print (".");
-  Serial.print (dateTime.year);
-  Serial.print (" ");
-  Serial.print (dateTime.day);
-  Serial.println (); 
-  */ 
-}
 
 void startEffects () {
 
