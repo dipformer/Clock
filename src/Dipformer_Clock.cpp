@@ -159,14 +159,27 @@ void CDipformer_Clock::begin () {
   
   //RTC  1302 init
   uint8_t r;
+  DateTime dt;
+  delay (100);
   r = DS1302_read (DS1302_SECONDS);  
   if (r & DS1302_CH) DS1302_write (DS1302_SECONDS, r & ~DS1302_CH);
   r = DS1302_read (DS1302_ENABLE);  
   if (r & DS1302_WP) DS1302_write (DS1302_ENABLE, r & ~DS1302_WP);
   r = DS1302_read (DS1302_TRICKLE); 
-  if (r == 0x5c) { // 1302 was power off
-    DateTime dt = {0, 0, 8, 1, 1, 6, 2022, TIME_AM, TIME_24_HOUR_FORMAT};
+  dt = getDateTime ();
+  if ((r == 0x5c) || 
+      (dt.seconds > 59) || 
+      (dt.minutes > 59) || 
+      (dt.hour > 23) ||
+      (dt.date > 31) ||
+      (dt.date == 0) ||
+      (dt.month > 12) ||
+      (dt.month = 0)
+      ) { // 1302 was power off
+    dt = {0, 0, 8, 1, 1, 6, 2022, TIME_AM, TIME_24_HOUR_FORMAT};
     setDateTime (dt);
+    r = DS1302_read (DS1302_ENABLE);  
+    DS1302_write (DS1302_ENABLE, r & ~DS1302_WP);
   } 
   DS1302_write (DS1302_TRICKLE, 0);   // charge disable         
   
