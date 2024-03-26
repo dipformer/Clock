@@ -191,6 +191,7 @@ void setup() {
   Clock.begin (); 
   
   if (restoreSettings () == 0) { // первый запуск контроллера, в памяти совсем нет данных
+    Clock.resetClock();
     settings.showMode = 3;
     settings.brightness = 4;
     settings.autoBrightness = 1;

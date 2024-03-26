@@ -99,13 +99,13 @@
 #define TIME_PM 1
 
 struct DateTime {
-  uint8_t seconds;
-  uint8_t minutes; 
-  uint8_t hour; 
-  uint8_t date;
-  uint8_t month;
-  uint8_t day;
-  uint16_t year;
+  uint8_t seconds; // 0 .. 59
+  uint8_t minutes; // 0 .. 59
+  uint8_t hour;   // 0 .. 23
+  uint8_t date;  // 1 .. 31
+  uint8_t month;  // 1 .. 12
+  uint8_t day;   // 1 .. 7
+  uint16_t year; // 2000 .. 2099
   uint8_t AM_PM; // 0 - AM, 1 = PM
   uint8_t hour_12_24; // 0 - 24 hours, 1 = 12 hours
 }; 
@@ -116,6 +116,7 @@ class CDipformer_Clock {
   public:
   CDipformer_Clock () {};
   void begin ();
+  void resetClock ();  // reset clock chip
 
   void playMelody (const uint16_t * buf);
   void playMelody (const uint16_t * buf, uint8_t tempo);

@@ -70,6 +70,7 @@
 #define DS1302_TCS2    0x40
 #define DS1302_TCS3    0x80
 
+
 struct DS1302_dateTime {
   uint8_t seconds;
   uint8_t minutes; 
@@ -165,24 +166,25 @@ void CDipformer_Clock::begin () {
   if (r & DS1302_CH) DS1302_write (DS1302_SECONDS, r & ~DS1302_CH);
   r = DS1302_read (DS1302_ENABLE);  
   if (r & DS1302_WP) DS1302_write (DS1302_ENABLE, r & ~DS1302_WP);
-  r = DS1302_read (DS1302_TRICKLE); 
   dt = getDateTime ();
-  if ((r == 0x5c) || 
+  if (
       (dt.seconds > 59) || 
       (dt.minutes > 59) || 
       (dt.hour > 23) ||
       (dt.date > 31) ||
       (dt.date == 0) ||
       (dt.month > 12) ||
-      (dt.month = 0)
+      (dt.month = 0) ||
+      (dt.day == 0) ||
+      (dt.year < 2023) ||
+      (dt.year > 2099)
       ) { // 1302 was power off
-    dt = {0, 0, 8, 1, 1, 6, 2022, TIME_AM, TIME_24_HOUR_FORMAT};
-    setDateTime (dt);
-    r = DS1302_read (DS1302_ENABLE);  
-    DS1302_write (DS1302_ENABLE, r & ~DS1302_WP);
+    resetClock ();
   } 
-  DS1302_write (DS1302_TRICKLE, 0);   // charge disable         
-  
+  r = DS1302_read (DS1302_ENABLE);  
+  DS1302_write (DS1302_ENABLE, r & ~DS1302_WP);
+  DS1302_write (DS1302_TRICKLE, 0);   // configure charge - not charge
+
   // enable interrupt TIMER1_COMPA_vect
   TCCR1A = 0;
   TCCR1B = (1 << WGM12) | (1 << CS11);
@@ -195,8 +197,14 @@ void CDipformer_Clock::begin () {
   currentAnalogPin = 0;
   ADMUX = 0x40 | currentAnalogPin; // AVcc
   ADCSRA |= (1<<ADSC); // start ADC
-  
 
+}
+
+
+void CDipformer_Clock::resetClock () {
+  uint8_t r;
+  DateTime dt = {0, 0, 8, 1, 1, 1, 2023, TIME_AM, TIME_24_HOUR_FORMAT};
+  setDateTime (dt);
 }
 
 
